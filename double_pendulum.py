@@ -2,7 +2,7 @@
 import numpy as np
 from scipy import sin, cos
 from scipy.integrate import odeint
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as pl
 
 
 class DoublePendulum(object):
@@ -13,6 +13,7 @@ class DoublePendulum(object):
 		self.init_status = np.array([0.0,0.0,0.0,0.0])      #[dth1, dth2, dv1, dv2]
 
 	def equations(self, w, t):
+		g = 9.8
 		m1, m2, l1, l2 = self.m1, self.m2, self.l1, self.l2
 		th1, th2, v1, v2 = w
 		dth1 = v1
@@ -32,14 +33,41 @@ class DoublePendulum(object):
 
 		return np.array([dth1, dth2, dv1, dv2])
 
-	def double_pendulum(pendulum, ts, te, tstep):
-		t = np.arange(ts, te, tstep)
-		track = odeint(self.equations, pendulum.init_status, t)
-		th1_array, th2_array = track[:,0], track[:, 1]
-		l1, l2 = pendulum.l1, pendulum.l2
-		x1 = l1*np.sin(th1_array)
-		y1 = -l1*np.cos(th1_array)
-		x2 = x1 + l2*np.sin(th2_array)
-		y2 = y1 - l2*np.cos(th2_array)
+	def double_pendulum(self, t):
+		""" Solve the system of equations describing the motion of the double pendulum"""
+		track = odeint(self.equations, self.init_status, t)
+		th1, th2 = track[-1, 0], track[-1, 1]
+		x1 = self.l1*np.sin(th1)
+		y1 = -self.l1*np.cos(th1)
+		x2 = x1 + self.l2*np.sin(th2)
+		y2 = y1 - self.l2*np.cos(th2)
 		pendulum.init_status = track[-1,:].copy() 
 		return [x1, y1, x2, y2]
+
+if __name__ == "__main__":
+	pendulum = DoublePendulum(1.0, 2.0, 1.0, 2.0)
+	th1, th2 = 1.0, 2.0
+	pendulum.init_status[:2] = th1, th2
+
+	ts = 0.0
+	te = 30.0
+	tstep = 0.02
+	t = np.arange(ts, te, tstep)
+
+	x1 = []
+	y1 = []
+	x2 = []
+	y2 = []
+	for tim in t:
+		time = np.array([tim, tim+tstep])
+		result = pendulum.double_pendulum(time)
+		x1.append(result[0])
+		y1.append(result[1])
+		x2.append(result[2])
+		y2.append(result[3])
+
+	pl.plot(x1,y1, label = "upper")
+	pl.plot(x2,y2, label = "lower")
+	pl.legend()
+	pl.axis("equal")
+	pl.show()
