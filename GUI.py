@@ -207,15 +207,39 @@ class Ui_MainWindow(QtGui.QMainWindow):
         icon.addPixmap(QtGui.QPixmap(_fromUtf8("Icon/start.png")), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.actionStart.setIcon(icon)
         self.actionStart.setObjectName(_fromUtf8("actionStart"))
-        self.mainToolBar.addAction(self.actionStart)
-
+        
+        self.actionStop = QtGui.QAction(MainWindow)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(
+            "Icon/stop.png")), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        self.actionStop.setIcon(icon)
+        self.actionStop.setObjectName(_fromUtf8("actionStop"))
+        
         self.actionExit = QtGui.QAction(MainWindow)
         icon = QtGui.QIcon()
         icon.addPixmap(
             QtGui.QPixmap(_fromUtf8("Icon/exit.png")), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.actionExit.setIcon(icon)
         self.actionExit.setObjectName(_fromUtf8("actionExit"))
+
+        self.mainToolBar.addAction(self.actionStart)
+        self.mainToolBar.addAction(self.actionStop)
+        self.mainToolBar.addSeparator()
         self.mainToolBar.addAction(self.actionExit)
+        self.mainToolBar.addSeparator()
+
+        # display the current time
+        self.label_currenttime = QtGui.QLabel(self.mainToolBar)
+        self.label_currenttime.setGeometry(QtCore.QRect(1000, 25, 60, 30))
+        self.label_currenttime.setObjectName(_fromUtf8("label_currenttime"))
+        self.label_currenttime.setStyleSheet(
+            "QLabel{font-weight: bold; font-size: 22px}")
+
+        self.lineEdit_timer = QtGui.QLineEdit(self.mainToolBar)
+        self.lineEdit_timer.setGeometry(QtCore.QRect(1070, 20, 100, 40))
+        self.lineEdit_timer.setObjectName(_fromUtf8("lineEdit_timer"))
+        self.lineEdit_timer.setReadOnly(True)
+        self.lineEdit_timer.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Bold))
 
         #
         self.retranslateUi(MainWindow)
@@ -253,8 +277,13 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.actionStart.setText(_translate("MainWindow", "Start", None))
         self.actionStart.setToolTip(_translate("MainWindow", "Start", None))
 
+        self.actionStop.setText(_translate("MainWindow", "Stop", None))
+        self.actionStop.setToolTip(_translate("MainWindow", "Stop", None))
+
         self.actionExit.setText(_translate("MainWindow", "Exit", None))
         self.actionExit.setToolTip(_translate("MainWindow", "Exit", None))
+
+        self.label_currenttime.setText(_translate("MainWindow", "Time:", None))
 
 
     # other class member function
@@ -276,11 +305,10 @@ class Ui_MainWindow(QtGui.QMainWindow):
 
     def timerCallback(self):
         """ timer callback function """
-        # update the current time
+        # update and display the current time
         self.timer_count += 1
-
-
-
+        self.current_time = self.timer_count*self.dt
+        self.lineEdit_timer.setText(str(self.current_time))
 
 
     # toolbar slot function
@@ -294,7 +322,12 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.pendulum = DoublePendulum(self.M1, self.M2, self.L1, self.L2)
 
         # start time advancement process
-        self.timer.start(self.tstep*1000.0)     # convert time unit from s to ms
+        self.timer.start(self.dt*1000.0)     # convert time unit from s to ms
+
+    @QtCore.pyqtSlot() # signal with no arguments
+    def on_actionStop_triggered(self):
+        """Toolbar stop button slot"""
+        self.timer.stop()
 
     @QtCore.pyqtSlot() # signal with no arguments
     def on_actionExit_triggered(self):
