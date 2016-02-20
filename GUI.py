@@ -464,19 +464,41 @@ class Ui_MainWindow(QtGui.QMainWindow):
 
     def get_input(self):
         """ get input data from the GUI """
+        # system parameters
         self.M1 = self.lineEdit_M1.text().toDouble()[0]
         self.M2 = self.lineEdit_M2.text().toDouble()[0]
         self.L1 = self.lineEdit_L1.text().toDouble()[0]
         self.L2 = self.lineEdit_L2.text().toDouble()[0]
 
+        # initial conditions
         self.th1 = self.lineEdit_th1.text().toDouble()[0]
         self.th2 = self.lineEdit_th2.text().toDouble()[0]
         self.w1 = self.lineEdit_w1.text().toDouble()[0]
         self.w2 = self.lineEdit_w2.text().toDouble()[0]
 
+        # time advancement setting
         self.ts = self.lineEdit_ts.text().toDouble()[0]
         self.te = self.lineEdit_te.text().toDouble()[0]
         self.dt = self.lineEdit_dt.text().toDouble()[0]
+
+    def set_input(self):
+        # system parameters
+        self.lineEdit_M1.setText(str(self.M1))
+        self.lineEdit_M2.setText(str(self.M2))
+        self.lineEdit_L1.setText(str(self.L1))
+        self.lineEdit_L2.setText(str(self.L2))
+
+        # initial conditions
+        self.lineEdit_th1.setText(str(self.th1))
+        self.lineEdit_th2.setText(str(self.th2))
+        self.lineEdit_w1.setText(str(self.w1))
+        self.lineEdit_w2.setText(str(self.w2))
+
+        # time advancement setting
+        self.lineEdit_ts.setText(str(self.ts))
+        self.lineEdit_te.setText(str(self.te))
+        self.lineEdit_dt.setText(str(self.dt))
+
 
     def timerCallback(self):
         """ timer callback function """
@@ -512,6 +534,59 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.iren.GetRenderWindow().Render()
 
     # toolbar slot function
+    @QtCore.pyqtSlot() # signal with no arguments
+    def on_actionImport_triggered(self):
+        """Toolbar import input button slot"""
+        filename = QtGui.QFileDialog.getOpenFileName(self, "Open Input file", "input files/")
+        if filename == "":
+            return
+        read_data = []
+        with open(filename, 'r') as f:
+            for line in f.readlines():
+                read_data.append(float(line.strip()))
+
+        # system parameters
+        self.M1 = read_data[0]
+        self.L1 = read_data[1]
+        self.M2 = read_data[2]
+        self.L2 = read_data[3]
+        # initial conditions
+        self.th1 = read_data[4]
+        self.th2 = read_data[5]
+        self.w1 = read_data[6]
+        self.w2 = read_data[7]
+        # time advancement setting
+        self.ts = read_data[8]
+        self.te = read_data[9]
+        self.dt = read_data[10]
+
+        # update the GUI
+        self.set_input()
+
+
+    @QtCore.pyqtSlot() # signal with no arguments
+    def on_actionExport_triggered(self):
+        """Toolbar export input button slot"""
+        self.get_input()
+        filename = QtGui.QFileDialog.getSaveFileName(self, "Export Input file", "input files/")
+        if filename == "":
+            return
+        with open(filename, 'wb') as f:
+            # system parameters
+            f.write("%f\n"%self.M1)
+            f.write("%f\n"%self.L1)
+            f.write("%f\n"%self.M2)
+            f.write("%f\n"%self.L2)
+            # initial conditions
+            f.write("%f\n"%self.th1)
+            f.write("%f\n"%self.th2)
+            f.write("%f\n"%self.w1)
+            f.write("%f\n"%self.w2)
+            # time advancement setting
+            f.write("%f\n"%self.ts)
+            f.write("%f\n"%self.te)
+            f.write("%f\n"%self.dt)       
+
     @QtCore.pyqtSlot() # signal with no arguments
     def on_actionSimulate_triggered(self):
         """Toolbar simulate button slot"""
