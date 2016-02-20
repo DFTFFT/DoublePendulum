@@ -13,6 +13,8 @@ class DoublePendulum(object):
 		self.init_status = np.array([0.0,0.0,0.0,0.0])      #[th1, th2, v1, v2]
 
 	def equations(self, w, t):
+		""" return the derivatives for each variable"""
+		# the input argument w is the state of all target varialbes
 		g = 9.8
 		m1, m2, l1, l2 = self.m1, self.m2, self.l1, self.l2
 		th1, th2, v1, v2 = w

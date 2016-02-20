@@ -176,14 +176,23 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.pushButton_clear.setIcon(icon)
         self.pushButton_clear.setIconSize(QtCore.QSize(20, 20))
 
-        self.pushButton_start = QtGui.QPushButton(self.settingFrame)
-        self.pushButton_start.setGeometry(QtCore.QRect(180, 480, 99, 27))
-        self.pushButton_start.setObjectName(_fromUtf8("pushButton_start"))
+        self.pushButton_init = QtGui.QPushButton(self.settingFrame)
+        self.pushButton_init.setGeometry(QtCore.QRect(180, 480, 99, 27))
+        self.pushButton_init.setObjectName(_fromUtf8("pushButton_init"))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(
+            _fromUtf8("Icon/init.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_init.setIcon(icon)
+        self.pushButton_init.setIconSize(QtCore.QSize(20, 20))
+
+        self.pushButton_simulate = QtGui.QPushButton(self.settingFrame)
+        self.pushButton_simulate.setGeometry(QtCore.QRect(180, 520, 99, 27))
+        self.pushButton_simulate.setObjectName(_fromUtf8("pushButton_simulate"))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(
             _fromUtf8("Icon/tick.png")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pushButton_start.setIcon(icon)
-        self.pushButton_start.setIconSize(QtCore.QSize(20, 20))
+        self.pushButton_simulate.setIcon(icon)
+        self.pushButton_simulate.setIconSize(QtCore.QSize(20, 20))
 
         # vtk widget
         self.vtk_widget = QVTKRenderWindowInteractor(self.centralWidget)
@@ -210,6 +219,30 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.mainToolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
         MainWindow.addToolBar(QtCore.Qt.TopToolBarArea, self.mainToolBar)
 
+        self.actionImport = QtGui.QAction(MainWindow)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("Icon/import.png")), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        self.actionImport.setIcon(icon)
+        self.actionImport.setObjectName(_fromUtf8("actionImport"))
+
+        self.actionExport = QtGui.QAction(MainWindow)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("Icon/export.png")), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        self.actionExport.setIcon(icon)
+        self.actionExport.setObjectName(_fromUtf8("actionExport"))
+
+        self.actionInit = QtGui.QAction(MainWindow)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("Icon/init.png")), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        self.actionInit.setIcon(icon)
+        self.actionInit.setObjectName(_fromUtf8("actionInit"))
+
+        self.actionSimulate = QtGui.QAction(MainWindow)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8("Icon/tick.png")), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        self.actionSimulate.setIcon(icon)
+        self.actionSimulate.setObjectName(_fromUtf8("actionSimulate"))
+
         self.actionStart = QtGui.QAction(MainWindow)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(_fromUtf8("Icon/start.png")), QtGui.QIcon.Normal, QtGui.QIcon.On)
@@ -222,6 +255,20 @@ class Ui_MainWindow(QtGui.QMainWindow):
             "Icon/stop.png")), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.actionStop.setIcon(icon)
         self.actionStop.setObjectName(_fromUtf8("actionStop"))
+
+        self.actionSave = QtGui.QAction(MainWindow)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(
+            "Icon/save.png")), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        self.actionSave.setIcon(icon)
+        self.actionSave.setObjectName(_fromUtf8("actionSave"))
+
+        self.actionInfo = QtGui.QAction(MainWindow)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(_fromUtf8(
+            "Icon/info.png")), QtGui.QIcon.Normal, QtGui.QIcon.On)
+        self.actionInfo.setIcon(icon)
+        self.actionInfo.setObjectName(_fromUtf8("actionInfo"))
         
         self.actionExit = QtGui.QAction(MainWindow)
         icon = QtGui.QIcon()
@@ -230,21 +277,29 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.actionExit.setIcon(icon)
         self.actionExit.setObjectName(_fromUtf8("actionExit"))
 
+        self.mainToolBar.addAction(self.actionImport)
+        self.mainToolBar.addAction(self.actionExport)
+        self.mainToolBar.addSeparator()
+        self.mainToolBar.addAction(self.actionInit)
+        self.mainToolBar.addAction(self.actionSimulate)
+        self.mainToolBar.addSeparator()
         self.mainToolBar.addAction(self.actionStart)
         self.mainToolBar.addAction(self.actionStop)
+        self.mainToolBar.addAction(self.actionSave)
         self.mainToolBar.addSeparator()
+        self.mainToolBar.addAction(self.actionInfo)
         self.mainToolBar.addAction(self.actionExit)
         self.mainToolBar.addSeparator()
 
         # add lineText to the toolbar to display the current time
         self.label_currenttime = QtGui.QLabel(self.mainToolBar)
-        self.label_currenttime.setGeometry(QtCore.QRect(1000, 25, 60, 30))
+        self.label_currenttime.setGeometry(QtCore.QRect(800, 25, 60, 30))
         self.label_currenttime.setObjectName(_fromUtf8("label_currenttime"))
         self.label_currenttime.setStyleSheet(
             "QLabel{font-weight: bold; font-size: 22px}")
 
         self.lineEdit_timer = QtGui.QLineEdit(self.mainToolBar)
-        self.lineEdit_timer.setGeometry(QtCore.QRect(1070, 20, 100, 40))
+        self.lineEdit_timer.setGeometry(QtCore.QRect(870, 20, 100, 40))
         self.lineEdit_timer.setObjectName(_fromUtf8("lineEdit_timer"))
         self.lineEdit_timer.setReadOnly(True)
         self.lineEdit_timer.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Bold))
@@ -290,14 +345,33 @@ class Ui_MainWindow(QtGui.QMainWindow):
 
         # pushBotton
         self.pushButton_clear.setText(_translate("MainWindow", "Clear", None))
-        self.pushButton_start.setText(_translate("MainWindow", "Start", None))
+        self.pushButton_init.setText(_translate("MainWindow", "Initialize", None))
+        self.pushButton_simulate.setText(_translate("MainWindow", "Simulate", None))
 
         # toolbar
+        self.actionImport.setText(_translate("MainWindow", "Import input", None))
+        self.actionImport.setToolTip(_translate("MainWindow", "Import input", None))
+
+        self.actionExport.setText(_translate("MainWindow", "Export input", None))
+        self.actionExport.setToolTip(_translate("MainWindow", "Export input", None))
+
+        self.actionInit.setText(_translate("MainWindow", "Initialize", None))
+        self.actionInit.setToolTip(_translate("MainWindow", "Initialize", None))
+
+        self.actionSimulate.setText(_translate("MainWindow", "Simulate", None))
+        self.actionSimulate.setToolTip(_translate("MainWindow", "Simulate", None))
+
         self.actionStart.setText(_translate("MainWindow", "Start", None))
         self.actionStart.setToolTip(_translate("MainWindow", "Start", None))
 
         self.actionStop.setText(_translate("MainWindow", "Stop", None))
         self.actionStop.setToolTip(_translate("MainWindow", "Stop", None))
+
+        self.actionSave.setText(_translate("MainWindow", "Save", None))
+        self.actionSave.setToolTip(_translate("MainWindow", "Save", None))
+
+        self.actionInfo.setText(_translate("MainWindow", "Infomation", None))
+        self.actionInfo.setToolTip(_translate("MainWindow", "Infomation", None))
 
         self.actionExit.setText(_translate("MainWindow", "Exit", None))
         self.actionExit.setToolTip(_translate("MainWindow", "Exit", None))
@@ -348,6 +422,37 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.sphereLActor.GetProperty().SetColor(0.0, 0.5, 1.0)
 
         self.ren.AddActor(self.sphereLActor)
+
+        # two ropes connected to the spheres
+        # upper rope
+        self.RopeU = vtk.vtkLineSource()
+        self.RopeU.SetPoint1(1, self.Y_lim, 0)
+        self.RopeU.SetPoint2(-10, 250, 0)
+
+        RopeUMapper = vtk.vtkPolyDataMapper()
+        RopeUMapper.SetInput(self.RopeU.GetOutput())
+
+        RopeUActor = vtk.vtkActor()
+        RopeUActor.SetMapper(RopeUMapper)
+        # RopeUActor.GetProperty().SetColor(1.0, 0.0, 0.0)
+        RopeUActor.GetProperty().SetLineWidth(5)
+
+        self.ren.AddActor(RopeUActor)
+
+        # lower rope
+        self.RopeL = vtk.vtkLineSource()
+        self.RopeL.SetPoint1(-10, 250, 0)
+        self.RopeL.SetPoint2(50, 100, 0)
+
+        RopeLMapper = vtk.vtkPolyDataMapper()
+        RopeLMapper.SetInput(self.RopeL.GetOutput())
+
+        RopeLActor = vtk.vtkActor()
+        RopeLActor.SetMapper(RopeLMapper)
+        # RopeLActor.GetProperty().SetColor(1.0, 0.0, 0.0)
+        RopeLActor.GetProperty().SetLineWidth(5)
+
+        self.ren.AddActor(RopeLActor)
 
         # Create a camera
         camera = vtk.vtkCamera()
