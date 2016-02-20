@@ -12,6 +12,7 @@ import numpy as np
 from PyQt4 import QtCore, QtGui
 from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from double_pendulum import DoublePendulum
+from MyMplCanvas import MyMplCanvas
 
 
 try:
