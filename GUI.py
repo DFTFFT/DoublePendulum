@@ -214,6 +214,9 @@ class Ui_MainWindow(QtGui.QMainWindow):
         # self.plot_trace.lines[1].set_color('blue')
         self.plot_trace.fig.legend((self.plot_trace.lines[0], self.plot_trace.lines[
                                    1]), ('upper', 'lower'), (0.15, 0.76))
+        self.plot_trace.axes.set_title("Trace of the pendulums", fontsize = 25)
+        self.plot_trace.axes.set_xlabel("x/m", fontsize = 15)
+        self.plot_trace.axes.set_ylabel("y/m", fontsize = 15)
 
         # phase angle
         self.plot_angle = MyMplCanvas(
@@ -222,6 +225,9 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.plot_angle.setObjectName(_fromUtf8("plot_angle"))
         self.plot_angle.axes.set_xlim(0, 10)
         self.plot_angle.axes.set_ylim(-1.6, 1.6)
+        self.plot_angle.axes.set_title("Angle of the pendulums", fontsize = 25)
+        self.plot_angle.axes.set_xlabel("Time/sec", fontsize = 15)
+        self.plot_angle.axes.set_ylabel("Angle/rad", fontsize = 15)
 
 
         # menuBar
@@ -531,11 +537,11 @@ class Ui_MainWindow(QtGui.QMainWindow):
             return
 
         # solve the governing system of equations at the current timestep
-        t = np.array([self.current_time, self.current_time+self.dt])
+        t = np.array([self.current_time-self.dt, self.current_time])
         result = self.pendulum.ode_solve(t)
 
         # update the vtk view to display the results
-        X1, Y1, X2, Y2 = result
+        X1, Y1, X2, Y2, self.th1, self.th2 = result
 
         # two spheres
         self.sphereU.SetCenter(X1*self.len_convert_factor, self.Y_lim+Y1*self.len_convert_factor, 0.0)
@@ -550,6 +556,13 @@ class Ui_MainWindow(QtGui.QMainWindow):
 
         # upate the vtk view
         self.iren.GetRenderWindow().Render()
+
+        # update the matplotlib plots
+        # plot trace
+        self.plot_trace.updateFig([[X1, Y1], [X2, Y2]])
+
+        # plot_angle
+        self.plot_angle.updateFig([[t[-1], self.th1], [t[-1], self.th2]])
 
     # toolbar slot function
     @QtCore.pyqtSlot() # signal with no arguments
@@ -629,14 +642,17 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.RopeL.SetPoint1(X1*self.len_convert_factor, self.Y_lim+Y1*self.len_convert_factor, 0.0)
         self.RopeL.SetPoint2(X2*self.len_convert_factor, self.Y_lim+Y2*self.len_convert_factor, 0.0)
 
+        # upate the vtk view
+        self.iren.GetRenderWindow().Render()
+
         # initialize the time setting
         self.timer_count = 0
         self.current_time = 0.0
         self.lineEdit_timer.setText(str(self.current_time))
 
-
-        # upate the vtk view
-        self.iren.GetRenderWindow().Render()
+        # clean the plots view
+        self.plot_trace.clearAxia()
+        self.plot_angle.clearAxia()
 
 
 

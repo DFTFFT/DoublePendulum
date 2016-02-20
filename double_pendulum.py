@@ -44,7 +44,7 @@ class DoublePendulum(object):
 		x2 = x1 + self.l2*np.sin(th2)
 		y2 = y1 - self.l2*np.cos(th2)
 		self.init_status = track[-1,:].copy() 
-		return [x1, y1, x2, y2]
+		return [x1, y1, x2, y2, th1, th2]
 
 if __name__ == "__main__":
 	pendulum = DoublePendulum(1.0, 2.0, 1.0, 2.0)
