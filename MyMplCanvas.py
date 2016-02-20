@@ -1,4 +1,5 @@
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
 
 class MyMplCanvas(FigureCanvas):
     """Embed the matplotlib into the Qt"""

@@ -203,9 +203,26 @@ class Ui_MainWindow(QtGui.QMainWindow):
 
 
         # plot_widget
-        self.plot_widget = QtGui.QWidget(self.centralWidget)
-        self.plot_widget.setGeometry(QtCore.QRect(760, 10, 421, 581))
-        self.plot_widget.setObjectName(_fromUtf8("plot_widget"))   
+        # trajectory
+        self.plot_trace = MyMplCanvas(
+            self.centralWidget, width=1, height=1, dpi=50, Ndim=2)
+        self.plot_trace.setGeometry(QtCore.QRect(760, 10, 431, 285))
+        self.plot_trace.setObjectName(_fromUtf8("plot_trace"))
+        self.plot_trace.axes.set_xlim(-5, 5)
+        self.plot_trace.axes.set_ylim(0, 5)
+        # self.plot_trace.lines[0].set_color('red')     # it doesn't work?
+        # self.plot_trace.lines[1].set_color('blue')
+        self.plot_trace.fig.legend((self.plot_trace.lines[0], self.plot_trace.lines[
+                                   1]), ('upper', 'lower'), (0.15, 0.76))
+
+        # phase angle
+        self.plot_angle = MyMplCanvas(
+            self.centralWidget, width=1, height=1, dpi=50, Ndim=2)
+        self.plot_angle.setGeometry(QtCore.QRect(760, 306, 431, 285))
+        self.plot_angle.setObjectName(_fromUtf8("plot_angle"))
+        self.plot_angle.axes.set_xlim(0, 10)
+        self.plot_angle.axes.set_ylim(-1.6, 1.6)
+
 
         # menuBar
         self.menuBar = QtGui.QMenuBar(MainWindow)
