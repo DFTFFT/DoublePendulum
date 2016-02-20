@@ -587,11 +587,46 @@ class Ui_MainWindow(QtGui.QMainWindow):
             f.write("%f\n"%self.te)
             f.write("%f\n"%self.dt)       
 
+    
+    @QtCore.pyqtSlot() # signal with no arguments
+    def on_actionInit_triggered(self):
+        """Toolbar initialize button slot"""
+        # get input data from the GUI
+        self.get_input()
+
+        # update the positions of the actors of the vtk based on the input
+        X1 = self.L1*np.sin(self.th1)
+        Y1 = -self.L1*np.cos(self.th1)
+        X2 = X1 + self.L2*np.sin(self.th2)
+        Y2 = Y1 - self.L2*np.cos(self.th2)
+
+        # two spheres
+        self.sphereU.SetCenter(X1*self.len_convert_factor, self.Y_lim+Y1*self.len_convert_factor, 0.0)
+        self.sphereL.SetCenter(X2*self.len_convert_factor, self.Y_lim+Y2*self.len_convert_factor, 0.0)
+
+        # two ropes
+        self.RopeU.SetPoint1(0.0 , self.Y_lim, 0.0)
+        self.RopeU.SetPoint2(X1*self.len_convert_factor, self.Y_lim+Y1*self.len_convert_factor, 0.0)
+
+        self.RopeL.SetPoint1(X1*self.len_convert_factor, self.Y_lim+Y1*self.len_convert_factor, 0.0)
+        self.RopeL.SetPoint2(X2*self.len_convert_factor, self.Y_lim+Y2*self.len_convert_factor, 0.0)
+
+        # initialize the time setting
+        self.timer_count = 0
+        self.current_time = 0.0
+        self.lineEdit_timer.setText(str(self.current_time))
+
+
+        # upate the vtk view
+        self.iren.GetRenderWindow().Render()
+
+
+
     @QtCore.pyqtSlot() # signal with no arguments
     def on_actionSimulate_triggered(self):
         """Toolbar simulate button slot"""
-        # get input data from the GUI
-        self.get_input()
+        # initialize the simulation
+        self.on_actionInit_triggered()
 
         # create pendulum object and initialize the state
         self.pendulum = DoublePendulum(self.M1, self.M2, self.L1, self.L2)
@@ -614,6 +649,39 @@ class Ui_MainWindow(QtGui.QMainWindow):
     def on_actionExit_triggered(self):
         """Toolbar exit button slot"""
         self.close()
+
+    # pushbutton slots
+    @QtCore.pyqtSlot() # signal with no arguments
+    def on_pushButton_clear_clicked(self):
+        """pushBotton clear function"""
+        # system parameters
+        self.lineEdit_M1.setText(str(""))
+        self.lineEdit_M2.setText(str(""))
+        self.lineEdit_L1.setText(str(""))
+        self.lineEdit_L2.setText(str(""))
+
+        # initial conditions
+        self.lineEdit_th1.setText(str(""))
+        self.lineEdit_th2.setText(str(""))
+        self.lineEdit_w1.setText(str(""))
+        self.lineEdit_w2.setText(str(""))
+
+        # time advancement setting
+        self.lineEdit_ts.setText(str(""))
+        self.lineEdit_te.setText(str(""))
+        self.lineEdit_dt.setText(str(""))
+
+    @QtCore.pyqtSlot() # signal with no arguments
+    def on_pushButton_init_clicked(self):
+        """pushBotton initialize function"""
+        self.on_actionInit_triggered()
+
+    @QtCore.pyqtSlot() # signal with no arguments
+    def on_pushButton_simulate_clicked(self):
+        """pushBotton simulate function"""
+        self.on_actionSimulate_triggered()
+
+
 
 
 if __name__ == '__main__':
