@@ -426,7 +426,7 @@ class Ui_MainWindow(QtGui.QMainWindow):
         # two ropes connected to the spheres
         # upper rope
         self.RopeU = vtk.vtkLineSource()
-        self.RopeU.SetPoint1(1, self.Y_lim, 0)
+        self.RopeU.SetPoint1(0, self.Y_lim, 0)
         self.RopeU.SetPoint2(-10, 250, 0)
 
         RopeUMapper = vtk.vtkPolyDataMapper()
@@ -496,14 +496,25 @@ class Ui_MainWindow(QtGui.QMainWindow):
 
         # update the vtk view to display the results
         X1, Y1, X2, Y2 = result
+
+        # two spheres
         self.sphereU.SetCenter(X1*self.len_convert_factor, self.Y_lim+Y1*self.len_convert_factor, 0.0)
         self.sphereL.SetCenter(X2*self.len_convert_factor, self.Y_lim+Y2*self.len_convert_factor, 0.0)
+
+        # two ropes
+        self.RopeU.SetPoint1(0.0 , self.Y_lim, 0.0)
+        self.RopeU.SetPoint2(X1*self.len_convert_factor, self.Y_lim+Y1*self.len_convert_factor, 0.0)
+
+        self.RopeL.SetPoint1(X1*self.len_convert_factor, self.Y_lim+Y1*self.len_convert_factor, 0.0)
+        self.RopeL.SetPoint2(X2*self.len_convert_factor, self.Y_lim+Y2*self.len_convert_factor, 0.0)
+
+        # upate the vtk view
         self.iren.GetRenderWindow().Render()
 
     # toolbar slot function
     @QtCore.pyqtSlot() # signal with no arguments
-    def on_actionStart_triggered(self):
-        """Toolbar start button slot"""
+    def on_actionSimulate_triggered(self):
+        """Toolbar simulate button slot"""
         # get input data from the GUI
         self.get_input()
 
@@ -513,6 +524,11 @@ class Ui_MainWindow(QtGui.QMainWindow):
 
         # start time advancement process
         self.timer.start(self.dt*1000.0)     # convert time unit from s to ms
+
+    @QtCore.pyqtSlot() # signal with no arguments
+    def on_actionStart_triggered(self):
+        """Toolbar start button slot"""
+        self.timer.start(self.dt*1000.0)
 
     @QtCore.pyqtSlot() # signal with no arguments
     def on_actionStop_triggered(self):
