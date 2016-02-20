@@ -7,7 +7,9 @@
 # WARNING! All changes made in this file will be lost!
 
 import sys
+import vtk
 from PyQt4 import QtCore, QtGui
+from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from double_pendulum import DoublePendulum
 
 
@@ -168,7 +170,6 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.pushButton_clear.setIcon(icon)
         self.pushButton_clear.setIconSize(QtCore.QSize(20, 20))
 
-
         self.pushButton_start = QtGui.QPushButton(self.settingFrame)
         self.pushButton_start.setGeometry(QtCore.QRect(180, 480, 99, 27))
         self.pushButton_start.setObjectName(_fromUtf8("pushButton_start"))
@@ -179,9 +180,10 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.pushButton_start.setIconSize(QtCore.QSize(20, 20))
 
         # vtk widget
-        self.vtk_widget = QtGui.QWidget(self.centralWidget)
+        self.vtk_widget = QVTKRenderWindowInteractor(self.centralWidget)
         self.vtk_widget.setGeometry(QtCore.QRect(320, 10, 431, 581))
         self.vtk_widget.setObjectName(_fromUtf8("vtk_widget"))
+        self.setvtkWidget()
 
 
         # plot_widget
@@ -228,7 +230,7 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.mainToolBar.addAction(self.actionExit)
         self.mainToolBar.addSeparator()
 
-        # display the current time
+        # add lineText to the toolbar to display the current time
         self.label_currenttime = QtGui.QLabel(self.mainToolBar)
         self.label_currenttime.setGeometry(QtCore.QRect(1000, 25, 60, 30))
         self.label_currenttime.setObjectName(_fromUtf8("label_currenttime"))
@@ -240,6 +242,17 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.lineEdit_timer.setObjectName(_fromUtf8("lineEdit_timer"))
         self.lineEdit_timer.setReadOnly(True)
         self.lineEdit_timer.setFont(QtGui.QFont("Arial", 20, QtGui.QFont.Bold))
+
+        # Layout management
+        #self.gridLayout = QtGui.QGridLayout(self.centralWidget)
+        #self.gridLayout.setMargin(11)
+        #self.gridLayout.setSpacing(6)
+        #self.gridLayout.setObjectName(_fromUtf8("gridLayout"))
+
+        #self.gridLayout.addWidget(self.settingFrame, 0, 0, 1, 1)
+        #self.gridLayout.addWidget(self.vtk_widget, 0, 1, 1, 1)
+        #self.gridLayout.addWidget(self.plot_widget, 0, 2, 1, 1)
+
 
         #
         self.retranslateUi(MainWindow)
@@ -287,6 +300,13 @@ class Ui_MainWindow(QtGui.QMainWindow):
 
 
     # other class member function
+    def setvtkWidget(self):
+        """ setup the vtk widget"""
+        self.ren = vtk.vtkRenderer()
+        self.ren.SetBackground(0.1, 0.2, 0.3)
+        self.vtk_widget.GetRenderWindow().AddRenderer(self.ren)
+        self.iren = self.vtk_widget.GetRenderWindow().GetInteractor()
+
     def get_input(self):
         """ get input data from the GUI """
         self.M1 = self.lineEdit_M1.text().toDouble()[0]
@@ -309,6 +329,11 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.timer_count += 1
         self.current_time = self.timer_count*self.dt
         self.lineEdit_timer.setText(str(self.current_time))
+
+        # Terminate the simulation when reaching the preset stop time
+        if self.current_time > self.te:
+            self.timer.stop()
+            return
 
 
     # toolbar slot function
@@ -342,6 +367,6 @@ if __name__ == '__main__':
 
     window.show()
 
-    #window.iren.Initialize()
+    window.iren.Initialize()
 
     sys.exit(app.exec_())
