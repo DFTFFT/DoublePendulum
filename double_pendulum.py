@@ -10,7 +10,7 @@ class DoublePendulum(object):
 
 	def __init__(self, m1, m2, l1, l2):
 		self.m1, self.m2, self.l1, self.l2 = m1, m2, l1, l2
-		self.init_status = np.array([0.0,0.0,0.0,0.0])      #[dth1, dth2, dv1, dv2]
+		self.init_status = np.array([0.0,0.0,0.0,0.0])      #[th1, th2, v1, v2]
 
 	def equations(self, w, t):
 		g = 9.8
@@ -33,7 +33,7 @@ class DoublePendulum(object):
 
 		return np.array([dth1, dth2, dv1, dv2])
 
-	def double_pendulum(self, t):
+	def ode_solve(self, t):
 		""" Solve the system of equations describing the motion of the double pendulum"""
 		track = odeint(self.equations, self.init_status, t)
 		th1, th2 = track[-1, 0], track[-1, 1]
@@ -41,7 +41,7 @@ class DoublePendulum(object):
 		y1 = -self.l1*np.cos(th1)
 		x2 = x1 + self.l2*np.sin(th2)
 		y2 = y1 - self.l2*np.cos(th2)
-		pendulum.init_status = track[-1,:].copy() 
+		self.init_status = track[-1,:].copy() 
 		return [x1, y1, x2, y2]
 
 if __name__ == "__main__":

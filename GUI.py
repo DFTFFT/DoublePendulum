@@ -8,6 +8,7 @@
 
 import sys
 import vtk
+import numpy as np
 from PyQt4 import QtCore, QtGui
 from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from double_pendulum import DoublePendulum
@@ -53,6 +54,11 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.timer.timeout.connect(self.timerCallback)
         self.timer_count = 0
         self.current_time = 0.0
+
+        # dimension of the vtk view 
+        self.len_convert_factor = 100.0   # length convert factor 1m = 100 pixels
+        self.X_lim = 500.0
+        self.Y_lim = 300.0
 
         # Setup UI widgets
         self.setupUi(self)
@@ -302,10 +308,54 @@ class Ui_MainWindow(QtGui.QMainWindow):
     # other class member function
     def setvtkWidget(self):
         """ setup the vtk widget"""
+        # Create renderer
         self.ren = vtk.vtkRenderer()
         self.ren.SetBackground(0.1, 0.2, 0.3)
         self.vtk_widget.GetRenderWindow().AddRenderer(self.ren)
         self.iren = self.vtk_widget.GetRenderWindow().GetInteractor()
+
+        # Two spheres' model
+        # upper sphere
+        # Create source
+        self.sphereU = vtk.vtkSphereSource()
+        self.sphereU.SetRadius(10)
+        self.sphereU.SetCenter(-10, 250, 0)
+
+        # Create a mapper
+        sphereUMapper = vtk.vtkPolyDataMapper()
+        sphereUMapper.SetInputConnection(self.sphereU.GetOutputPort())
+
+        # Create an actor
+        self.sphereUActor = vtk.vtkActor()
+        self.sphereUActor.SetMapper(sphereUMapper)
+        self.sphereUActor.GetProperty().SetColor(1.0, 0.2, 0.2)
+
+        self.ren.AddActor(self.sphereUActor)
+
+        # lower sphere
+        # Create source
+        self.sphereL = vtk.vtkSphereSource()
+        self.sphereL.SetRadius(15)
+        self.sphereL.SetCenter(50, 100, 0)
+
+        # Create a mapper
+        sphereLMapper = vtk.vtkPolyDataMapper()
+        sphereLMapper.SetInputConnection(self.sphereL.GetOutputPort())
+
+        # Create an actor
+        self.sphereLActor = vtk.vtkActor()
+        self.sphereLActor.SetMapper(sphereLMapper)
+        self.sphereLActor.GetProperty().SetColor(0.0, 0.5, 1.0)
+
+        self.ren.AddActor(self.sphereLActor)
+
+        # Create a camera
+        camera = vtk.vtkCamera()
+        self.ren.SetActiveCamera(camera)
+        self.ren.GetActiveCamera().SetPosition(0, 150, 1000)
+        self.ren.GetActiveCamera().SetFocalPoint(0, 150, 0)
+        self.ren.GetActiveCamera().SetViewUp(0, 1, 0)
+        self.ren.GetActiveCamera().UpdateViewport(self.ren)
 
     def get_input(self):
         """ get input data from the GUI """
@@ -330,11 +380,20 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.current_time = self.timer_count*self.dt
         self.lineEdit_timer.setText(str(self.current_time))
 
-        # Terminate the simulation when reaching the preset stop time
+        # terminate the simulation when reaching the preset stop time
         if self.current_time > self.te:
             self.timer.stop()
             return
 
+        # solve the governing system of equations at the current timestep
+        t = np.array([self.current_time, self.current_time+self.dt])
+        result = self.pendulum.ode_solve(t)
+
+        # update the vtk view to display the results
+        X1, Y1, X2, Y2 = result
+        self.sphereU.SetCenter(X1*self.len_convert_factor, self.Y_lim+Y1*self.len_convert_factor, 0.0)
+        self.sphereL.SetCenter(X2*self.len_convert_factor, self.Y_lim+Y2*self.len_convert_factor, 0.0)
+        self.iren.GetRenderWindow().Render()
 
     # toolbar slot function
     @QtCore.pyqtSlot() # signal with no arguments
@@ -343,8 +402,9 @@ class Ui_MainWindow(QtGui.QMainWindow):
         # get input data from the GUI
         self.get_input()
 
-        # create pendulum object
+        # create pendulum object and initialize the state
         self.pendulum = DoublePendulum(self.M1, self.M2, self.L1, self.L2)
+        self.pendulum.init_status = np.array([self.th1, self.th2, self.w1, self.w2])
 
         # start time advancement process
         self.timer.start(self.dt*1000.0)     # convert time unit from s to ms
