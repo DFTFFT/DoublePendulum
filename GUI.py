@@ -9,10 +9,12 @@
 import sys
 import vtk
 import numpy as np
+import cProfile
 from PyQt4 import QtCore, QtGui
 from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from double_pendulum import DoublePendulum
 from MyMplCanvas import MyMplCanvas
+from aboutdialogui import Ui_AboutDialog
 
 
 try:
@@ -290,7 +292,7 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.actionInfo = QtGui.QAction(MainWindow)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(_fromUtf8(
-            "Icon/info.png")), QtGui.QIcon.Normal, QtGui.QIcon.On)
+            "Icon/info.svg")), QtGui.QIcon.Normal, QtGui.QIcon.On)
         self.actionInfo.setIcon(icon)
         self.actionInfo.setObjectName(_fromUtf8("actionInfo"))
         
@@ -678,6 +680,13 @@ class Ui_MainWindow(QtGui.QMainWindow):
     def on_actionStop_triggered(self):
         """Toolbar stop button slot"""
         self.timer.stop()
+
+    @QtCore.pyqtSlot() # signal with no arguments
+    def on_actionInfo_triggered(self):
+        """Toolbar info button slot"""
+        aboutDlg = Ui_AboutDialog()
+        aboutDlg.setModal(True)
+        aboutDlg.exec_()
 
     @QtCore.pyqtSlot() # signal with no arguments
     def on_actionExit_triggered(self):
