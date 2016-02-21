@@ -15,6 +15,7 @@ from vtk.qt4.QVTKRenderWindowInteractor import QVTKRenderWindowInteractor
 from double_pendulum import DoublePendulum
 from MyMplCanvas import MyMplCanvas
 from aboutdialogui import Ui_AboutDialog
+from archive import archive
 
 
 try:
@@ -62,6 +63,9 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.len_convert_factor = 100.0   # length convert factor 1m = 100 pixels
         self.X_lim = 500.0
         self.Y_lim = 300.0
+
+        # archive (history) of the results
+        self.archive = archive()
 
         # Setup UI widgets
         self.setupUi(self)
@@ -542,6 +546,9 @@ class Ui_MainWindow(QtGui.QMainWindow):
         t = np.array([self.current_time-self.dt, self.current_time])
         result = self.pendulum.ode_solve(t)
 
+        # save results history to the archive
+        self.archive.addData(np.insert(result, 0, t[-1]))
+
         # update the vtk view to display the results
         X1, Y1, X2, Y2, self.th1, self.th2 = result
 
@@ -656,6 +663,16 @@ class Ui_MainWindow(QtGui.QMainWindow):
         self.plot_trace.clearAxia()
         self.plot_angle.clearAxia()
 
+        self.plot_trace.fig.legend((self.plot_trace.lines[0], self.plot_trace.lines[
+                                   1]), ('upper', 'lower'), (0.15, 0.76))
+        self.plot_trace.axes.set_title("Trace of the pendulums", fontsize = 25)
+        self.plot_trace.axes.set_xlabel("x/m", fontsize = 15)
+        self.plot_trace.axes.set_ylabel("y/m", fontsize = 15)
+
+        self.plot_angle.axes.set_title("Angle of the pendulums", fontsize = 25)
+        self.plot_angle.axes.set_xlabel("Time/sec", fontsize = 15)
+        self.plot_angle.axes.set_ylabel("Angle/rad", fontsize = 15)
+
 
 
     @QtCore.pyqtSlot() # signal with no arguments
@@ -680,6 +697,19 @@ class Ui_MainWindow(QtGui.QMainWindow):
     def on_actionStop_triggered(self):
         """Toolbar stop button slot"""
         self.timer.stop()
+
+    @QtCore.pyqtSlot() # signal with no arguments
+    def on_actionSave_triggered(self):
+        """Toolbar save button slot"""
+        filename = QtGui.QFileDialog.getSaveFileName(self, "Save result file", "results/")
+        with open(filename, 'wb') as f:
+            f.write("Time     X1     Y1     X2     Y2    th1     th2\n")
+            N = self.archive.getLen()
+            for i in range(N):
+                f.write("%f     %f     %f      %f      %f     %f     %f\n"
+                    %(self.archive.t[i], self.archive.X1[i], self.archive.Y1[i],
+                        self.archive.X2[i], self.archive.Y2[i], self.archive.th1[i],
+                        self.archive.th2[i]))
 
     @QtCore.pyqtSlot() # signal with no arguments
     def on_actionInfo_triggered(self):
