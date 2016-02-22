@@ -545,6 +545,8 @@ class Ui_MainWindow(QtGui.QMainWindow):
         # solve the governing system of equations at the current timestep
         t = np.array([self.current_time-self.dt, self.current_time])
         result = self.pendulum.ode_solve(t)
+        # alternative euler method to solve the ODEs
+        #result = self.pendulum.euler_ode(self.current_time, self.dt)
 
         # save results history to the archive
         self.archive.addData(np.insert(result, 0, t[-1]))
@@ -683,7 +685,7 @@ class Ui_MainWindow(QtGui.QMainWindow):
 
         # create pendulum object and initialize the state
         self.pendulum = DoublePendulum(self.M1, self.M2, self.L1, self.L2)
-        self.pendulum.init_status = np.array([self.th1, self.th2, self.w1, self.w2])
+        self.pendulum.status = np.array([self.th1, self.th2, self.w1, self.w2])
 
         # start time advancement process
         self.timer.start(self.dt*1000.0)     # convert time unit from s to ms
